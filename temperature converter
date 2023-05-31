@@ -1,0 +1,147 @@
+
+import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+
+public class temperatureConverter extends Application {
+    private ComboBox<String> fromComboBox;
+    private ComboBox<String> toComboBox;
+    private TextField inputField;
+    private Label outputLabel;
+
+    @Override
+    public void start(Stage primaryStage) {
+        primaryStage.setTitle("Temperature Converter");
+
+        GridPane gridPane = createGridPane();
+        addUIControls(gridPane);
+        addConversionButton(gridPane);
+        addClearButton(gridPane);
+
+        Scene scene = new Scene(gridPane, 300, 200);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    private GridPane createGridPane() {
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setPadding(new Insets(10, 10, 10, 10));
+        gridPane.setHgap(5);
+        gridPane.setVgap(5);
+        return gridPane;
+    }
+
+    private void addUIControls(GridPane gridPane) {
+        Label titleLabel = new Label("Temperature Converter");
+        titleLabel.setStyle("-fx-font-size: 18px;");
+        gridPane.add(titleLabel, 0, 0, 2, 1);
+
+        fromComboBox = new ComboBox<>();
+        fromComboBox.getItems().addAll("Celsius", "Fahrenheit", "Kelvin");
+        fromComboBox.setValue("Celsius");
+        gridPane.add(fromComboBox, 0, 1);
+
+        Label toLabel = new Label("to");
+        gridPane.add(toLabel, 1, 1);
+
+        toComboBox = new ComboBox<>();
+        toComboBox.getItems().addAll("Celsius", "Fahrenheit", "Kelvin");
+        toComboBox.setValue("Fahrenheit");
+        gridPane.add(toComboBox, 2, 1);
+
+        Label inputLabel = new Label("Input:");
+        gridPane.add(inputLabel, 0, 2);
+
+        inputField = new TextField();
+        gridPane.add(inputField, 1, 2);
+
+        Label outputTitleLabel = new Label("Output:");
+        gridPane.add(outputTitleLabel, 0, 3);
+
+        outputLabel = new Label();
+        gridPane.add(outputLabel, 1, 3);
+    }
+
+    private void addConversionButton(GridPane gridPane) {
+        Button convertButton = new Button("Convert");
+        convertButton.setOnAction(e -> convertTemperature());
+        gridPane.add(convertButton, 0, 4, 2, 1);
+    }
+
+    private void addClearButton(GridPane gridPane) {
+        Button clearButton = new Button("Clear");
+        clearButton.setOnAction(e -> clearFields());
+        gridPane.add(clearButton, 2, 4);
+    }
+
+    private void convertTemperature() {
+        try {
+            double input = Double.parseDouble(inputField.getText());
+            String fromUnit = fromComboBox.getValue();
+            String toUnit = toComboBox.getValue();
+
+            double result;
+            if (fromUnit.equals("Celsius")) {
+                if (toUnit.equals("Fahrenheit")) {
+                    result = celsiusToFahrenheit(input);
+                } else {
+                    result = celsiusToKelvin(input);
+                }
+            } else if (fromUnit.equals("Fahrenheit")) {
+                if (toUnit.equals("Celsius")) {
+                    result = fahrenheitToCelsius(input);
+                } else {
+                    result = fahrenheitToKelvin(input);
+                }
+            } else {
+                if (toUnit.equals("Celsius")) {
+                    result = kelvinToCelsius(input);
+                } else {
+                    result = kelvinToFahrenheit(input);
+                }
+            }
+
+            outputLabel.setText(String.format("%.2f %s", result, toUnit));
+        } catch (NumberFormatException e) {
+            outputLabel.setText("Invalid input!");
+        }
+    }
+
+    private double celsiusToFahrenheit(double celsius) {
+        return (celsius * 9 / 5) + 32;
+    }
+
+    private double celsiusToKelvin(double celsius) {
+        return celsius + 273.15;
+    }
+
+    private double fahrenheitToCelsius(double fahrenheit) {
+        return (fahrenheit - 32) * 5 / 9;
+    }
+
+    private double fahrenheitToKelvin(double fahrenheit) {
+        return (fahrenheit + 459.67) * 5 / 9;
+    }
+
+    private double kelvinToCelsius(double kelvin) {
+        return kelvin - 273.15;
+    }
+
+    private double kelvinToFahrenheit(double kelvin) {
+        return (kelvin * 9 / 5) - 459.67;
+    }
+
+    private void clearFields() {
+        inputField.clear();
+        outputLabel.setText("");
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
